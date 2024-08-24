@@ -1,0 +1,1 @@
+add_library(connections STATIC TCPClient.hpp TCPClient.cpp)
