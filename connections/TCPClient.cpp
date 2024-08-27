@@ -40,7 +40,9 @@ TCPClient::~TCPClient()
 }
 
 void TCPClient::send_message(const std::string& msg) {
+    // Convert from host to network long
+    uint32_t size_of_msg = htonl(std::size(msg));
+    send(clientSocketFD_, &size_of_msg, sizeof(uint32_t), 0);
     send(clientSocketFD_, msg.c_str(), std::size(msg), 0);
-    std::cout << "sent: " << msg << std::endl;
 }
 } // namespace con

@@ -56,6 +56,10 @@
         "streambuf": "cpp",
         "thread": "cpp",
         "typeinfo": "cpp",
-        "source_location": "cpp"
+        "source_location": "cpp",
+        "codecvt": "cpp",
+        "fstream": "cpp",
+        "iomanip": "cpp",
+        "sstream": "cpp"
     }
 }

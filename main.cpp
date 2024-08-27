@@ -24,7 +24,7 @@ std::ostream& operator<<(std::ostream& os, const tutorial::Person& b)
 
 int main(int argc, char *argv[]) {    
 
-    // con::TCPClient client("127.0.0.1", 29920);
+    con::TCPClient client("127.0.0.1", 29920);
 
     // Create data to send
     tutorial::Person a;
@@ -77,7 +77,9 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Parsed:\n"  << b << std::endl;
 
-    // client.send_message("Test");
-    // client.send_message(a.SerializeAsString());
+    client.send_message(a.SerializeAsString());
+    client.send_message(a.SerializeAsString());
+    client.send_message(a.SerializeAsString());
+
     return 0;
 }
