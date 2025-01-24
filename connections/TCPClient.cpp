@@ -6,8 +6,15 @@
 #include <unistd.h> // close socket
 
 #include "TCPClient.hpp"
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include <string>
+
+using namespace std::string_literals;
 
 namespace con {
+const std::string LOGGER_NAME = "TCPClient"s;
+auto logger = spdlog::stdout_color_mt(LOGGER_NAME);
 TCPClient::TCPClient(const std::string& host, const int port) : HOSTNAME_(host), PORT_(port)
 {
     sockaddr_in serverAddress;
@@ -27,16 +34,16 @@ TCPClient::TCPClient(const std::string& host, const int port) : HOSTNAME_(host),
     int status = connect(clientSocketFD_, (sockaddr*) &serverAddress, sizeof(serverAddress));
     if(status < 0)
     {
-        std::cout << "Error connecting to socket!"<< std::endl;
+        std::cerr << "Error connecting to socket!"<< std::endl;
         throw std::runtime_error("Error connecting to socket!");
     }
-    std::cout << "Connection to host: " << HOSTNAME_ << " on port: " << PORT_ << " established!" << std::endl;
+    spdlog::get(LOGGER_NAME)->info("Connection to host: {} on port: {} established!", HOSTNAME_, PORT_);
 }
 
 TCPClient::~TCPClient()
 {
     close(clientSocketFD_);
-    std::cout << "Connection closed!" << std::endl;
+    spdlog::get(LOGGER_NAME)->info("Connection closed!");
 }
 
 void TCPClient::send_message(const std::string& msg) {

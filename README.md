@@ -20,3 +20,6 @@ and
 ```
 protoc --pyi_out=../../PycharmProjects/PythonTCPClient/ protos/addressbook.proto
 ```
+
+For devs install spdlog:
+```sudo apt install libspdlog-dev```

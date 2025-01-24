@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(tcpclient)
+
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(Protobuf REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIR})
+find_package(spdlog REQUIRED)
 
 add_subdirectory(connections)
 
@@ -12,6 +14,7 @@ add_executable(main main.cpp protos/addressbook.pb.cc)
 
 target_link_libraries(main PUBLIC connections)
 target_link_libraries(main PRIVATE ${PROTOBUF_LIBRARY})
+target_link_libraries(main PRIVATE spdlog::spdlog)
 
 target_include_directories(main PUBLIC
                           "${PROJECT_BINARY_DIR}"
