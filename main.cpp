@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream> 
 #include <source_location>
+#include "google/protobuf/util/delimited_message_util.h"
 
 namespace fs = std::filesystem;
 // Custom output of tutorial::Person. Preferably use .DebugString()
@@ -23,7 +24,7 @@ std::ostream& operator<<(std::ostream& os, const tutorial::Person& b)
 }
 
 int main(int argc, char *argv[]) {    
-
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
     con::TCPClient client("127.0.0.1", 29920);
 
     // Create data to send
@@ -31,9 +32,9 @@ int main(int argc, char *argv[]) {
     a.set_name("Martin");
     a.set_id(2);
     a.set_email("ma.davidsen1@gmail.com");
-    tutorial::Person::PhoneNumber* phone_number = a.add_phones();
+    auto* phone_number = a.add_phones();
     phone_number->set_number("42 61 67 03");
-    phone_number->set_type(tutorial::Person::PhoneType::Person_PhoneType_PHONE_TYPE_MOBILE);
+    phone_number->set_type(tutorial::Person::PHONE_TYPE_MOBILE);
 
     phone_number = a.add_phones();
     phone_number->set_number("89 93 89 89");
@@ -61,25 +62,21 @@ int main(int argc, char *argv[]) {
 
     // Two ways of serialization:
     // number 1:
-    auto msg = a.SerializeAsString();
+    std::stringstream data;
+    google::protobuf::util::SerializeDelimitedToOstream(a, &data);
     
-    // number 2:
-    std::string data;
-    a.SerializeToString(&data);
-
-    assert(data == msg);
-
-    std::cout << "After serialization: {" << msg << "}\n" << std::endl;
+    std::cout << "After serialization with delimited: {" << data.str() << "}\n" << std::endl;
 
     // Parse from data
-    tutorial::Person b;
-    b.ParseFromString(msg);
+    tutorial::Person parsed_person;
+    parsed_person.ParseFromString(data.str());
 
-    std::cout << "Parsed:\n"  << b << std::endl;
+    std::cout << "\nParsed person:\n" << parsed_person.DebugString() << std::endl;
 
-    client.send_message(a.SerializeAsString());
-    client.send_message(a.SerializeAsString());
-    client.send_message(a.SerializeAsString());
+    client.send_message(data.str());
+
+    // send again
+    client.send_message(data.str());
 
     return 0;
 }
