@@ -5,12 +5,15 @@
 #include <source_location>
 #include <string>
 #include <ranges>
+#include <chrono>
+#include <thread>
 #include "google/protobuf/util/delimited_message_util.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace fs = std::filesystem;
 using namespace std::literals;
+using namespace std::chrono_literals;
 // Custom output of tutorial::Person. Preferably use .DebugString()
 std::ostream& operator<<(std::ostream& os, const tutorial::Person& b)
 {
@@ -32,8 +35,8 @@ std::ostream& operator<<(std::ostream& os, const tutorial::Person& b)
 int main(int argc, char *argv[]) {    
     GOOGLE_PROTOBUF_VERIFY_VERSION;
     spdlog::set_level(spdlog::level::info);
-    const std::string LOGGER_NAME = "console"s;
-    auto logger = spdlog::stdout_color_mt(LOGGER_NAME);
+    const auto LOGGER_NAME = "console"s;
+    const auto logger = spdlog::stdout_color_mt(LOGGER_NAME);
 
     con::TCPClient client("127.0.0.1", 29920);
 
@@ -85,9 +88,24 @@ int main(int argc, char *argv[]) {
     client.send_message(data.str());
 
     // send again
+    const auto now = std::chrono::system_clock::now();
+    const std::time_t time_start = std::chrono::system_clock::to_time_t(now);
+    logger->info("Started sending at: {}", std::ctime(&time_start));
+
     for(auto i : std::views::iota(1, 100)){
         client.send_message(data.str());
+        std::this_thread::sleep_for(10ms);
     }
+    const auto end = std::chrono::system_clock::now();
+    const std::time_t time_end = std::chrono::system_clock::to_time_t(end);
+
+    logger->info("Ended sending at: {}", std::ctime(&time_end));
+    const std::chrono::duration<double> elapsed_seconds{end - now};
+    // workaround for not being able to format duration
+    std::stringstream ss;
+    ss << elapsed_seconds;
+    logger->info("Started sending at: {}", ss.str());
+
 
     return 0;
 }
