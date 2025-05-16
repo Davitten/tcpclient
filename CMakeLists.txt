@@ -4,16 +4,15 @@ project(tcpclient)
 
 set(CMAKE_CXX_STANDARD 20)
 
-find_package(Protobuf REQUIRED)
-include_directories(${PROTOBUF_INCLUDE_DIR})
 find_package(spdlog REQUIRED)
 
 add_subdirectory(connections)
+add_subdirectory(protos)
 
-add_executable(main main.cpp protos/addressbook.pb.cc)
+add_executable(main main.cpp)
 
 target_link_libraries(main PUBLIC connections)
-target_link_libraries(main PRIVATE ${PROTOBUF_LIBRARY})
+target_link_libraries(main PUBLIC protos)
 target_link_libraries(main PRIVATE spdlog::spdlog)
 
 target_include_directories(main PUBLIC

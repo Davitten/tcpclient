@@ -4,6 +4,7 @@
 #include <fstream> 
 #include <source_location>
 #include <string>
+#include <ranges>
 #include "google/protobuf/util/delimited_message_util.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
@@ -53,7 +54,7 @@ int main(int argc, char *argv[]) {
 
     // Get path to the the current source location
     fs::path current_path = std::source_location::current().file_name();
-    fs::path output_file_path = current_path.parent_path() / "test.txt";
+    fs::path output_file_path = current_path.parent_path() / "main.log";
 
     spdlog::get(LOGGER_NAME)->info("Writing to file: {}", output_file_path.c_str());
 
@@ -84,7 +85,9 @@ int main(int argc, char *argv[]) {
     client.send_message(data.str());
 
     // send again
-    client.send_message(data.str());
+    for(auto i : std::views::iota(1, 100)){
+        client.send_message(data.str());
+    }
 
     return 0;
 }
